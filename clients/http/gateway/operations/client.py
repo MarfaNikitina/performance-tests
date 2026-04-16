@@ -1,9 +1,58 @@
 from typing import TypedDict
+import random
+from clients.http.gateway.client import build_gateway_http_client
 
-from django.db.models import enums
 from httpx import Response, QueryParams
 
 from clients.http.client import HTTPClient
+from enum import Enum
+
+class StatusEnum(str, Enum):
+    """
+    Enum для выбора статуса.
+    """
+    FAILED = "FAILED"
+    COMPLETED = "COMPLETED"
+    IN_PROGRESS = "IN_PROGRESS"
+    UNSPECIFIED = "UNSPECIFIED"
+
+class OperationDict(TypedDict):
+    """
+    Описание структуры операции.
+    """
+    id: str
+    type: str
+    status: str
+    amount: float
+    cardId: str
+    category: str
+    createdAt: str
+    accountId: str
+
+class OperationReceiptDict(TypedDict):
+    """
+    Описание структуры чека.
+    """
+    url: str
+    document: str
+
+class GetOperationResponseDict(TypedDict):
+    """
+    Описание структуры ответа для получения данных по операции.
+    """
+    operation: OperationDict
+
+class GetOperationsResponseDict(TypedDict):
+    """
+    Описание структуры ответа для получения списка операций по счету.
+    """
+    operations: list[OperationDict]
+
+class GetOperationReceiptResponseDict(TypedDict):
+    """
+    Описание структуры ответа  для получения чека по операции.
+    """
+    receipt: OperationReceiptDict
 
 class GetOperationsQueryDict(TypedDict):
     """
@@ -17,6 +66,20 @@ class GetOperationsSummaryQueryDict(TypedDict):
     """
     accountId: str
 
+class OperationsSummaryDict(TypedDict):
+    """
+    Описание структуры статистики по операциям для определенного счета.
+    """
+    spentAmount: float
+    receivedAmount: float
+    cashbackAmount: float
+
+class GetOperationSummaryResponseDict(TypedDict):
+    """
+    Описание структуры ответа для получения статистики по операциям для определенного счета.
+    """
+    summary: OperationsSummaryDict
+
 class MakeFeeOperationRequestDict(TypedDict):
     """
     Структура данных для создание операции комиссии.
@@ -26,14 +89,26 @@ class MakeFeeOperationRequestDict(TypedDict):
     cardId: str
     accountId: str
 
+class MakeFeeOperationResponseDict(TypedDict):
+    """
+    Описание структуры ответа создания операции комиссии.
+    """
+    operation: OperationDict
+
 class MakeTopUpOperationRequestDict(TypedDict):
     """
-    Структура данных для создание операции пополнения.
+    Структура данных для создания операции пополнения.
     """
     status: str
     amount: float
     cardId: str
     accountId: str
+
+class MakeTopUpOperationResponseDict(TypedDict):
+    """
+    Описание структуры ответа создания операции пополнения.
+    """
+    operation: OperationDict
 
 class MakeCashbackOperationRequestDict(TypedDict):
     """
@@ -43,6 +118,12 @@ class MakeCashbackOperationRequestDict(TypedDict):
     amount: float
     cardId: str
     accountId: str
+
+class MakeCashbackOperationResponseDict(TypedDict):
+    """
+    Описание структуры ответа создания операции кэшбэка.
+    """
+    operation: OperationDict
 
 
 class MakeTransferOperationRequestDict(TypedDict):
@@ -54,6 +135,12 @@ class MakeTransferOperationRequestDict(TypedDict):
     cardId: str
     accountId: str
 
+class MakeTransferOperationResponseDict(TypedDict):
+    """
+    Описание структуры ответа создания операции перевода.
+    """
+    operation: OperationDict
+
 class MakePurchaseOperationRequestDict(TypedDict):
     """
     Структура данных для создание операции покупки.
@@ -62,6 +149,14 @@ class MakePurchaseOperationRequestDict(TypedDict):
     amount: float
     cardId: str
     accountId: str
+    category: str
+
+class MakePurchaseOperationResponseDict(TypedDict):
+    """
+    Описание структуры ответа создания операции покупки.
+    """
+    operation: OperationDict
+
 
 class MakeBillPaymentOperationRequestDict(TypedDict):
     """
@@ -72,6 +167,12 @@ class MakeBillPaymentOperationRequestDict(TypedDict):
     cardId: str
     accountId: str
 
+class MakeBillPaymentOperationResponseDict(TypedDict):
+    """
+    Описание структуры ответа создания операции оплаты по счету.
+    """
+    operation: OperationDict
+
 class MakeCashWithdrawalOperationRequestDict(TypedDict):
     """
     Структура данных для создание операции снятия наличных денег.
@@ -81,6 +182,12 @@ class MakeCashWithdrawalOperationRequestDict(TypedDict):
     cardId: str
     accountId: str
 
+
+class MakeCashWithdrawalOperationResponseDict(TypedDict):
+    """
+    Описание структуры ответа создания операции снятия наличных денег.
+    """
+    operation: OperationDict
 
 
 class OperationsGatewayHTTPClient(HTTPClient):
@@ -187,3 +294,101 @@ class OperationsGatewayHTTPClient(HTTPClient):
         :return: Объект httpx.Response с результатом операции.
         """
         return self.post("/api/v1/operations/make-cash-withdrawal-operation", json=request)
+
+
+    def get_operation(self, operation_id: str) -> GetOperationResponseDict:
+        response = self.get_operation_api(operation_id)
+        return response.json()
+
+    def get_operation_receipt(self, operation_id: str) -> GetOperationReceiptResponseDict:
+        response = self.get_operation_receipt_api(operation_id)
+        return response.json()
+
+    def get_operations(self, account_id: str) -> GetOperationsResponseDict:
+        query = GetOperationsQueryDict(accountId=account_id)
+        response = self.get_operations_api(query)
+        return response.json()
+
+    def get_operations_summary(self, account_id: str) -> GetOperationSummaryResponseDict:
+        query = GetOperationsSummaryQueryDict(accountId=account_id)
+        response = self.get_operations_summary_api(query)
+        return response.json()
+
+    def make_fee_operation(self, account_id: str, card_id: str) -> MakeFeeOperationResponseDict:
+        request = MakeFeeOperationRequestDict(
+            status=random.choice(list(StatusEnum)),
+            amount=round(random.uniform(1, 100), 2),
+            cardId=card_id,
+            accountId=account_id
+        )
+        response = self.make_fee_operation_api(request)
+        return response.json()
+
+    def make_top_up_operation(self, account_id: str, card_id: str) -> MakeTopUpOperationResponseDict:
+        request = MakeTopUpOperationRequestDict(
+            status=random.choice(list(StatusEnum)),
+            amount=round(random.uniform(1, 100), 2),
+            cardId=card_id,
+            accountId=account_id
+        )
+        response = self.make_top_up_operation_api(request)
+        return response.json()
+
+    def make_cashback_operation(self, account_id: str, card_id: str) -> MakeCashbackOperationResponseDict:
+        request = MakeCashbackOperationRequestDict(
+            status=random.choice(list(StatusEnum)),
+            amount=round(random.uniform(1, 100), 2),
+            cardId=card_id,
+            accountId=account_id
+        )
+        response = self.make_cashback_operation_api(request)
+        return response.json()
+
+    def make_transfer_operation(self, account_id: str, card_id: str) -> MakeTransferOperationResponseDict:
+        request = MakeTransferOperationRequestDict(
+            status=random.choice(list(StatusEnum)),
+            amount=round(random.uniform(1, 100), 2),
+            cardId=card_id,
+            accountId=account_id
+        )
+        response = self.make_transfer_operation_api(request)
+        return response.json()
+
+    def make_purchase_operation(self, account_id: str, card_id: str) -> MakePurchaseOperationResponseDict:
+        request = MakePurchaseOperationRequestDict(
+            status=random.choice(list(StatusEnum)),
+            amount=round(random.uniform(1, 100), 2),
+            cardId=card_id,
+            accountId=account_id,
+            category="string"
+        )
+        response = self.make_purchase_operation_api(request)
+        return response.json()
+
+    def make_bill_payment_operation(self, account_id: str, card_id: str) -> MakeBillPaymentOperationResponseDict:
+        request = MakeBillPaymentOperationRequestDict(
+            status=random.choice(list(StatusEnum)),
+            amount=round(random.uniform(1, 100), 2),
+            cardId=card_id,
+            accountId=account_id
+        )
+        response = self.make_bill_payment_operation_api(request)
+        return response.json()
+
+    def make_cash_withdrawal_operation(self, account_id: str, card_id: str) -> MakeCashWithdrawalOperationResponseDict:
+        request = MakeCashWithdrawalOperationRequestDict(
+            status=random.choice(list(StatusEnum)),
+            amount=round(random.uniform(1, 100), 2),
+            cardId=card_id,
+            accountId=account_id
+        )
+        response = self.make_cash_withdrawal_operation_api(request)
+        return response.json()
+
+def build_operations_gateway_http_client() -> OperationsGatewayHTTPClient:
+    """
+    Функция создаёт экземпляр OperationsGatewayHTTPClient с уже настроенным HTTP-клиентом.
+
+    :return: Готовый к использованию OperationsGatewayHTTPClient.
+    """
+    return OperationsGatewayHTTPClient(client=build_gateway_http_client())
