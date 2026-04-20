@@ -22,6 +22,7 @@ class AccountSchema(BaseModel):
     """
     Описание структуры аккаунта.
     """
+
     id: str
     type: AccountType
     cards: list[CardSchema]
