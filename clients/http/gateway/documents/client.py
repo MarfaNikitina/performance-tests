@@ -1,30 +1,12 @@
 from httpx import Response
-from typing import TypedDict
 
 from clients.http.client import HTTPClient
 from clients.http.gateway.client import build_gateway_http_client
 
-
-class DocumentDict(TypedDict):
-    """
-    Описание структуры документа.
-    """
-    url: str
-    document: str
-
-# Добавили описание структуры ответа получения документа тарифа
-class GetTariffDocumentResponseDict(TypedDict):
-    """
-    Описание структуры ответа получения документа тарифа.
-    """
-    tariff: DocumentDict
-
-# Добавили описание структуры ответа получения документа контракта
-class GetContactDocumentResponseDict(TypedDict):
-    """
-    Описание структуры ответа получения документа контракта.
-    """
-    contract: DocumentDict
+from clients.http.gateway.documents.schema import (  # Добавили импорт моделей
+    GetTariffDocumentResponseSchema,
+    GetContactDocumentResponseSchema
+)
 
 class DocumentsGatewayHTTPClient(HTTPClient):
     """
@@ -50,14 +32,16 @@ class DocumentsGatewayHTTPClient(HTTPClient):
         return self.get(f"/api/v1/documents/contract-document/{account_id}")
 
     # Добавили новый метод
-    def get_tariff_document(self, account_id: str ) -> GetTariffDocumentResponseDict:
+    def get_tariff_document(self, account_id: str ) -> GetTariffDocumentResponseSchema:
         response = self.get_tariff_document_api(account_id)
-        return response.json()
+        # Инициализируем модель через валидацию JSON строки
+        return GetTariffDocumentResponseSchema.model_validate_json(response.text)
 
     # Добавили новый метод
-    def get_contract_document(self, account_id: str) -> GetContactDocumentResponseDict:
+    def get_contract_document(self, account_id: str) -> GetContactDocumentResponseSchema:
         response = self.get_contract_document_api(account_id)
-        return response.json()
+        # Инициализируем модель через валидацию JSON строки
+        return GetContactDocumentResponseSchema.model_validate_json(response.text)
 
 def build_documents_gateway_http_client() -> DocumentsGatewayHTTPClient:
     """

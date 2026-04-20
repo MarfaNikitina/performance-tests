@@ -13,15 +13,16 @@ print('Create user response:', create_user_response)
 
 # Открываем дебетовый счет
 open_credit_card_account_response = accounts_gateway_client.open_credit_card_account(
-    user_id=create_user_response['user']['id']
+    user_id=create_user_response.user.id
 )
 print('Open credit card account response:', open_credit_card_account_response)
 
 # Получаем документ тарифа
-get_tariff_document_response = document_gateway_client.get_tariff_document(account_id=open_credit_card_account_response['account']['id'])
+get_tariff_document_response = document_gateway_client.get_tariff_document(open_credit_card_account_response.account.id)
 print('Get tariff document response:', get_tariff_document_response)
 
 
+
 # Получаем документ контракта
-get_contract_document_response = document_gateway_client.get_contract_document(account_id=open_credit_card_account_response['account']['id'])
+get_contract_document_response = document_gateway_client.get_contract_document(open_credit_card_account_response.account.id)
 print('Get contract document response:', get_contract_document_response)
