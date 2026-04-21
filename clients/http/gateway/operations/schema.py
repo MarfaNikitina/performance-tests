@@ -1,5 +1,6 @@
 from pydantic import BaseModel, Field, ConfigDict, HttpUrl
 from enum import StrEnum
+from datetime import datetime
 
 class StatusEnum(StrEnum):
     """
@@ -10,6 +11,19 @@ class StatusEnum(StrEnum):
     IN_PROGRESS = "IN_PROGRESS"
     UNSPECIFIED = "UNSPECIFIED"
 
+class OperationTypeEnum(StrEnum):
+    """
+    Enum для выбора типа операции.
+    """
+    FEE = "FEE"
+    TOP_UP = "TOP_UP"
+    PURCHASE = "PURCHASE"
+    CASHBACK = "CASHBACK"
+    TRANSFER = "TRANSFER"
+    BILL_PAYMENT = "BILL_PAYMENT"
+    CASH_WITHDRAWAL = "CASH_WITHDRAWAL"
+
+
 class OperationSchema(BaseModel):
     """
     Описание структуры операции.
@@ -17,12 +31,12 @@ class OperationSchema(BaseModel):
     model_config = ConfigDict(populate_by_name=True)
 
     id: str
-    type: str
+    type: OperationTypeEnum
     status: StatusEnum
     amount: float
     card_id: str = Field(alias="cardId")
     category: str
-    created_at: str = Field(alias="createdAt")
+    created_at: datetime = Field(alias="createdAt")
     account_id: str = Field(alias="accountId")
 
 class OperationReceiptSchema(BaseModel):
