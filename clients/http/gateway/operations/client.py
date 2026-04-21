@@ -1,4 +1,3 @@
-import random
 from clients.http.gateway.client import build_gateway_http_client
 
 from httpx import Response, QueryParams
@@ -24,8 +23,7 @@ MakePurchaseOperationRequestSchema,
 MakeTransferOperationResponseSchema,
 MakeTopUpOperationResponseSchema,
 MakeTopUpOperationRequestSchema,
-MakeFeeOperationRequestSchema,
-StatusEnum
+MakeFeeOperationRequestSchema
 )
 
 
@@ -160,8 +158,6 @@ class OperationsGatewayHTTPClient(HTTPClient):
 
     def make_fee_operation(self, account_id: str, card_id: str) -> MakeFeeOperationResponseSchema:
         request = MakeFeeOperationRequestSchema(
-            status=random.choice(list(StatusEnum)),
-            amount=round(random.uniform(1, 100), 2),
             cardId=card_id,
             accountId=account_id
         )
@@ -170,8 +166,6 @@ class OperationsGatewayHTTPClient(HTTPClient):
 
     def make_top_up_operation(self, account_id: str, card_id: str) -> MakeTopUpOperationResponseSchema:
         request = MakeTopUpOperationRequestSchema(
-            status=random.choice(list(StatusEnum)),
-            amount=round(random.uniform(1, 100), 2),
             cardId=card_id,
             accountId=account_id
         )
@@ -180,8 +174,6 @@ class OperationsGatewayHTTPClient(HTTPClient):
 
     def make_cashback_operation(self, account_id: str, card_id: str) -> MakeCashbackOperationResponseSchema:
         request = MakeCashbackOperationRequestSchema(
-            status=random.choice(list(StatusEnum)),
-            amount=round(random.uniform(1, 100), 2),
             cardId=card_id,
             accountId=account_id
         )
@@ -190,8 +182,6 @@ class OperationsGatewayHTTPClient(HTTPClient):
 
     def make_transfer_operation(self, account_id: str, card_id: str) -> MakeTransferOperationResponseSchema:
         request = MakeTransferOperationRequestSchema(
-            status=random.choice(list(StatusEnum)),
-            amount=round(random.uniform(1, 100), 2),
             cardId=card_id,
             accountId=account_id
         )
@@ -200,19 +190,14 @@ class OperationsGatewayHTTPClient(HTTPClient):
 
     def make_purchase_operation(self, account_id: str, card_id: str) -> MakePurchaseOperationResponseSchema:
         request = MakePurchaseOperationRequestSchema(
-            status=random.choice(list(StatusEnum)),
-            amount=round(random.uniform(1, 100), 2),
             cardId=card_id,
-            accountId=account_id,
-            category="string"
+            accountId=account_id
         )
         response = self.make_purchase_operation_api(request)
         return MakePurchaseOperationResponseSchema.model_validate_json(response.text)
 
     def make_bill_payment_operation(self, account_id: str, card_id: str) -> MakeBillPaymentOperationResponseSchema:
         request = MakeBillPaymentOperationRequestSchema(
-            status=random.choice(list(StatusEnum)),
-            amount=round(random.uniform(1, 100), 2),
             cardId=card_id,
             accountId=account_id
         )
@@ -221,8 +206,6 @@ class OperationsGatewayHTTPClient(HTTPClient):
 
     def make_cash_withdrawal_operation(self, account_id: str, card_id: str) -> MakeCashWithdrawalOperationResponseSchema:
         request = MakeCashWithdrawalOperationRequestSchema(
-            status=random.choice(list(StatusEnum)),
-            amount=round(random.uniform(1, 100), 2),
             cardId=card_id,
             accountId=account_id
         )
