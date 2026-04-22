@@ -52,7 +52,7 @@ print('Open debit card account response:', open_debit_card_account_response)
 
 # 3. Создаём операцию пополнения счета, привязанную к счёту и карте
 make_top_up_operation_request = MakeTopUpOperationRequest(
-    status=OperationStatus.OPERATION_STATUS_IN_PROGRESS,  # Статус операции (в процессе)
+    status=OperationStatus.OPERATION_STATUS_COMPLETED,  # Статус операции (в процессе)
     amount=fake.amount(),  # Сумма покупки
     card_id=open_debit_card_account_response.account.cards[0].id,  # ID первой карты счёта
     account_id=open_debit_card_account_response.account.id  # ID счёта
