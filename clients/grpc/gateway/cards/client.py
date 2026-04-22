@@ -10,7 +10,7 @@ from contracts.services.gateway.cards.rpc_issue_physical_card_pb2 import IssuePh
 class CardsGatewayHTTPClient(GRPCClient):
     """
        gRPC-клиент для взаимодействия с CardsGatewayService.
-       Предоставляет высокоуровневые методы для получения и создания пользователей.
+       Предоставляет высокоуровневые методы для создания физической и виртуальной карты.
     """
 
     def __init__(self, channel: Channel):
@@ -34,20 +34,30 @@ class CardsGatewayHTTPClient(GRPCClient):
 
     def issue_physical_card_api(self, request: IssuePhysicalCardRequest) -> IssuePhysicalCardResponse:
         """
-        Низкоуровневый вызов метода IssueVirtualCard через gRPC..
+        Низкоуровневый вызов метода IssuePhysicalCard через gRPC.
 
-        :param request: gRPC-запрос с ID пользлователя и аккаунта.
+        :param request: gRPC-запрос с ID пользователя и аккаунта.
         :return: Ответ от сервиса c данными выпущенной карты.
         """
         return self.stub.IssuePhysicalCard(request)
 
-    # Добавили новый метод
+
     def issue_virtual_card(self, user_id: str, account_id: str) -> IssueVirtualCardResponse:
+        """
+        Создание виртуальной карты.
+
+        :return: Ответ с информацией о созданной виртуальной карте.
+        """
         request = IssueVirtualCardRequest(user_id=user_id, account_id=account_id)
         return self.issue_virtual_card_api(request)
 
-    # Добавили новый метод
+
     def issue_physical_card(self, user_id: str, account_id: str) -> IssuePhysicalCardResponse:
+        """
+        Создание физической карты.
+
+        :return: Ответ с информацией о созданной физической карте.
+        """
         request = IssuePhysicalCardRequest(user_id=user_id, account_id=account_id)
         return self.issue_physical_card_api(request)
 
