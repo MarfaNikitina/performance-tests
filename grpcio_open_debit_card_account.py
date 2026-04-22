@@ -35,5 +35,7 @@ open_debit_card_account_request = OpenDebitCardAccountRequest(
     user_id = create_user_response.user.id
 )
 
-open_debit_card_account_response: OpenDebitCardAccountResponse = accounts_gateway_service.OpenDebitCardAccount(open_debit_card_account_request)
+open_debit_card_account_response: OpenDebitCardAccountResponse = (
+    accounts_gateway_service.OpenDebitCardAccount(open_debit_card_account_request)
+)
 print('Open debit card account response:', open_debit_card_account_response)
