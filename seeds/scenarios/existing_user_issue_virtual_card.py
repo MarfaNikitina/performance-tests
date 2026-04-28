@@ -12,7 +12,7 @@ class ExistingUserIssueVirtualCardSeedsScenario(SeedsScenario):
     def plan(self) -> SeedsPlan:
         """
         Возвращает план сидинга для создания пользователей и их счетов.
-        Мы создаём 300 пользователей, каждый получит дебетовый и сберегательный счёт.
+        Мы создаём 300 пользователей, каждый получит дебетовый счёт.
         """
         return SeedsPlan(
             users=SeedUsersPlan(
