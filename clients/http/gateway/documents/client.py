@@ -8,6 +8,7 @@ from clients.http.gateway.documents.schema import (  # Добавили импо
     GetTariffDocumentResponseSchema,
     GetContactDocumentResponseSchema
 )
+from tools.routes import APIRoutes  # Импортируем enum APIRoutes
 
 class DocumentsGatewayHTTPClient(HTTPClient):
     """
@@ -22,9 +23,9 @@ class DocumentsGatewayHTTPClient(HTTPClient):
         :return: Ответ от сервера (объект httpx.Response).
         """
         return self.get(
-            f"/api/v1/documents/tariff-document/{account_id}",
+            f"{APIRoutes.DOCUMENTS}/tariff-document/{account_id}",
             # Явно передаём логическое имя маршрута
-            extensions=HTTPClientExtensions(route="/api/v1/documents/tariff-document/{account_id}")
+            extensions=HTTPClientExtensions(route=f"{APIRoutes.DOCUMENTS}/tariff-document/{{account_id}}")
         )
 
 
@@ -36,9 +37,9 @@ class DocumentsGatewayHTTPClient(HTTPClient):
         :return: Ответ от сервера (объект httpx.Response).
         """
         return self.get(
-            f"/api/v1/documents/contract-document/{account_id}",
+            f"{APIRoutes.DOCUMENTS}/contract-document/{account_id}",
             # Явно передаём логическое имя маршрута
-            extensions=HTTPClientExtensions(route="/api/v1/documents/contract-document/{account_id}")
+            extensions=HTTPClientExtensions(route=f"{APIRoutes.DOCUMENTS}/contract-document/{{account_id}}")
         )
 
     # Добавили новый метод
